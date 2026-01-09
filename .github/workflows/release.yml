@@ -1,0 +1,33 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore
+        run: dotnet restore .\CopyOpsSuite.sln
+
+      - name: Publish App.WinUI
+        run: dotnet publish .\src\App.WinUI\App.WinUI.csproj -c Release -o .\artifacts\app
+
+      - name: Create zip
+        run: |
+          powershell Compress-Archive -Path .\artifacts\app\* -DestinationPath .\artifacts\CopyOpsSuite.zip
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/CopyOpsSuite.zip
