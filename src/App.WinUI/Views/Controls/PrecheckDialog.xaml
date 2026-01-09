@@ -1,0 +1,50 @@
+<ContentDialog
+    x:Class="CopyOpsSuite.App.WinUI.Views.Controls.PrecheckDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    xmlns:viewmodels="using:CopyOpsSuite.App.WinUI.ViewModels"
+    xmlns:converters="using:CopyOpsSuite.App.WinUI.Converters"
+    Title="Precheck de destinos">
+
+    <ContentDialog.Resources>
+        <converters:PrecheckLevelBrushConverter x:Key="PrecheckLevelBrushConverter" />
+    </ContentDialog.Resources>
+
+    <StackPanel Spacing="12">
+        <TextBlock Text=" Verifica los controles antes de iniciar y observa qué destinos requieren atención." TextWrapping="Wrap"/>
+        <ListView
+            x:Name="PrecheckList"
+            MaxHeight="320"
+            BorderThickness="0">
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="viewmodels:PrecheckDisplayItem">
+                    <Grid ColumnDefinitions="Auto, *" ColumnSpacing="8" Padding="6">
+                        <Border
+                            Width="56"
+                            Height="24"
+                            CornerRadius="12"
+                            Background="{Binding Level, Converter={StaticResource PrecheckLevelBrushConverter}}"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center">
+                            <TextBlock
+                                Text="{x:Bind LevelText}"
+                                FontWeight="SemiBold"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                FontSize="12"/>
+                        </Border>
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="{x:Bind Device}" FontWeight="SemiBold" />
+                            <TextBlock Text="{x:Bind Message}" FontSize="12" Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+            <Button Content="Cancelar" Click="Cancel_Click"/>
+            <Button x:Name="ForceButton" Content="Forzar inicio" Click="Force_Click" Visibility="Collapsed"/>
+        </StackPanel>
+    </StackPanel>
+</ContentDialog>

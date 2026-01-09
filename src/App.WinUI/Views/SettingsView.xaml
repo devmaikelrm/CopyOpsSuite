@@ -1,0 +1,205 @@
+<Page
+    x:Class="CopyOpsSuite.App.WinUI.Views.SettingsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+    xmlns:converters="using:CopyOpsSuite.App.WinUI.Converters"
+    xmlns:viewmodels="using:CopyOpsSuite.App.WinUI.ViewModels"
+    x:DataType="viewmodels:SettingsViewModel"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+        <converters:ValidationBrushConverter x:Key="ValidationBrushConverter" />
+    </Page.Resources>
+
+    <Grid Padding="24" RowSpacing="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <muxc:InfoBar
+            Grid.Row="0"
+            IsOpen="{x:Bind InfoBarIsOpen, Mode=TwoWay}"
+            Severity="{x:Bind InfoBarSeverity}"
+            Title="Estado"
+            Visibility="{x:Bind InfoBarIsOpen, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
+            Message="{x:Bind InfoBarMessage}" />
+
+        <Grid Grid.Row="1" ColumnSpacing="16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="3*" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Padding="16" CornerRadius="12" Background="{ThemeResource SystemControlBackgroundBaseLowBrush}">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="Modo de acceso" FontWeight="SemiBold" FontSize="16" />
+                    <ToggleSwitch Header="Modo operador" IsOn="{x:Bind OperatorModeEnabled, Mode=TwoWay}" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button Content="Cambiar a admin" Command="{x:Bind SwitchToAdminCommand}" />
+                        <Button Content="Bloquear admin" Command="{x:Bind LockAdminCommand}" IsEnabled="{x:Bind AdminUnlocked}" />
+                    </StackPanel>
+                    <TextBlock
+                        Text="Advertencia: usa el PIN por defecto 1234."
+                        Foreground="DarkOrange"
+                        Visibility="{x:Bind ShowDefaultPinWarning, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                    <Border
+                        Background="{ThemeResource SystemControlCriticalBaseLowBrush}"
+                        CornerRadius="6"
+                        Padding="6"
+                        Visibility="{x:Bind IsAdvancedRestricted, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <TextBlock Text="Solo Admin" Foreground="{ThemeResource SystemControlCriticalBaseHighBrush}" FontWeight="SemiBold" />
+                    </Border>
+                    <ComboBox
+                        Header="Tema de la app"
+                        ItemsSource="{x:Bind ThemeOptions}"
+                        SelectedValue="{x:Bind SelectedTheme, Mode=TwoWay}"
+                        SelectedValuePath="Value"
+                        DisplayMemberPath="Label" />
+                    <ComboBox
+                        Header="Modo de facturacion"
+                        ItemsSource="{x:Bind BillingModeOptions}"
+                        SelectedValue="{x:Bind SelectedBillingMode, Mode=TwoWay}"
+                        SelectedValuePath="Value"
+                        DisplayMemberPath="Label"
+                        IsEnabled="{x:Bind IsAdvancedRestricted, Converter={StaticResource InverseBooleanConverter}}" />
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="1" Padding="16" CornerRadius="12" Background="{ThemeResource SystemControlBackgroundBaseLowBrush}">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Buffering en RAM" FontWeight="SemiBold" FontSize="16" />
+                    <ToggleSwitch Header="Habilitar buffering" IsOn="{x:Bind EnableBuffering, Mode=TwoWay}" IsEnabled="{x:Bind IsAdvancedRestricted, Converter={StaticResource InverseBooleanConverter}}" />
+                    <StackPanel Orientation="Horizontal" ColumnSpacing="12">
+                        <muxc:NumberBox Header="Chunk MB" Value="{x:Bind ChunkSizeMb, Mode=TwoWay}" Minimum="1" Maximum="1024" IsEnabled="{x:Bind IsAdvancedRestricted, Converter={StaticResource InverseBooleanConverter}}" />
+                        <muxc:NumberBox Header="Max chunks" Value="{x:Bind MaxChunks, Mode=TwoWay}" Minimum="1" Maximum="128" IsEnabled="{x:Bind IsAdvancedRestricted, Converter={StaticResource InverseBooleanConverter}}" />
+                        <muxc:NumberBox Header="Trabajadores" Value="{x:Bind WriterWorkersPerTarget, Mode=TwoWay}" Minimum="1" Maximum="8" IsEnabled="{x:Bind IsAdvancedRestricted, Converter={StaticResource InverseBooleanConverter}}" />
+                    </StackPanel>
+                    <TextBlock Text="{x:Bind BufferWarningPrimary}" FontSize="12" Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+                    <TextBlock Text="{x:Bind BufferWarningSecondary}" FontSize="12" Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+                    <ToggleSwitch Header="Anclar mini ventanas arriba" IsOn="{x:Bind PinMiniTopMost, Mode=TwoWay}" />
+                    <Button Content="Guardar configuracion" Command="{x:Bind SaveBufferingCommand}" IsEnabled="{x:Bind IsAdvancedRestricted, Converter={StaticResource InverseBooleanConverter}}" />
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <Border Grid.Row="2" Padding="16" CornerRadius="12" Background="{ThemeResource SystemControlBackgroundBaseLowBrush}">
+            <StackPanel Spacing="10">
+                <TextBlock Text="Diagnostico" FontWeight="SemiBold" FontSize="16" />
+                <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                    <ComboBox
+                        Header="Destino opcional"
+                        ItemsSource="{x:Bind DiagnosticsDevices}"
+                        DisplayMemberPath="DisplayName"
+                        SelectedValuePath="DeviceId"
+                        SelectedValue="{x:Bind SelectedDiagnosticsDeviceId, Mode=TwoWay}"
+                        Width="220" />
+                    <Button Content="{x:Bind DiagnosticsButtonText}" Command="{x:Bind RunDiagnosticsCommand}" IsEnabled="{x:Bind IsDiagnosticsRunning, Converter={StaticResource InverseBooleanConverter}}" />
+                    <ProgressRing Width="24" Height="24" IsActive="{x:Bind IsDiagnosticsRunning}" Visibility="{x:Bind IsDiagnosticsRunning, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                </StackPanel>
+                <TextBlock Text="{x:Bind DiagnosticsStatus}" FontSize="12" Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+                <TextBlock Text="{x:Bind DiagnosticsSummary}" FontSize="12" TextWrapping="WrapWholeWords" />
+                <ListView ItemsSource="{x:Bind DiagnosticsLog}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="x:String">
+                            <TextBlock Text="{x:Bind}" FontSize="12" />
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="3" Padding="16" CornerRadius="12" Background="{ThemeResource SystemControlBackgroundBaseLowBrush}">
+            <StackPanel Spacing="12">
+                <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                    <TextBlock Text="Precios por volumen (CUP+)" FontWeight="SemiBold" FontSize="16" />
+                    <Button Content="Generar estructura recomendada Cuba"
+                            Command="{x:Bind GenerateRecommendedTiersCommand}"
+                            IsEnabled="{x:Bind IsAdvancedRestricted, Converter={StaticResource InverseBooleanConverter}}" />
+                    <Button Content="Ordenar por MinGB"
+                            Command="{x:Bind SortTiersByMinGbCommand}"
+                            IsEnabled="{x:Bind IsAdvancedRestricted, Converter={StaticResource InverseBooleanConverter}}" />
+                    <Button Content="Guardar tiers"
+                            Command="{x:Bind SaveTiersCommand}"
+                            IsEnabled="{x:Bind CanSaveTiers}" />
+                </StackPanel>
+                <TextBlock Text="Editor de tiers en CUP+. La fila CAP debe ser 1024-0 y no se debe solapar con otras." FontSize="12"
+                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+                <TextBlock Text="{x:Bind TierValidationMessage}" FontSize="12"
+                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+                <controls:DataGrid x:Name="PricingTiersGrid"
+                                   ItemsSource="{x:Bind PricingTiers}"
+                                   AutoGenerateColumns="False"
+                                   CanUserResizeColumns="True"
+                                   CanUserSortColumns="False"
+                                   IsReadOnly="{x:Bind IsAdvancedRestricted}"
+                                   CellEditEnded="OnTierCellEditEnded">
+                    <controls:DataGrid.RowStyle>
+                        <Style TargetType="controls:DataGridRow">
+                            <Setter Property="Background" Value="{Binding IsRowValid, Converter={StaticResource ValidationBrushConverter}}" />
+                        </Style>
+                    </controls:DataGrid.RowStyle>
+                    <controls:DataGrid.Columns>
+                        <controls:DataGridTextColumn Header="Min GB" Binding="{Binding MinGB, Mode=TwoWay}" Width="90">
+                            <controls:DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextAlignment" Value="Right" />
+                                </Style>
+                            </controls:DataGridTextColumn.ElementStyle>
+                            <controls:DataGridTextColumn.EditingElementStyle>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="TextAlignment" Value="Right" />
+                                </Style>
+                            </controls:DataGridTextColumn.EditingElementStyle>
+                        </controls:DataGridTextColumn>
+                        <controls:DataGridTextColumn Header="Max GB (0=INF)" Binding="{Binding MaxGB, Mode=TwoWay}" Width="120">
+                            <controls:DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextAlignment" Value="Right" />
+                                </Style>
+                            </controls:DataGridTextColumn.ElementStyle>
+                            <controls:DataGridTextColumn.EditingElementStyle>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="TextAlignment" Value="Right" />
+                                </Style>
+                            </controls:DataGridTextColumn.EditingElementStyle>
+                        </controls:DataGridTextColumn>
+                        <controls:DataGridTextColumn Header="Precio CUP+" Binding="{Binding PriceCUP, Mode=TwoWay}" Width="120">
+                            <controls:DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextAlignment" Value="Right" />
+                                </Style>
+                            </controls:DataGridTextColumn.ElementStyle>
+                            <controls:DataGridTextColumn.EditingElementStyle>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="TextAlignment" Value="Right" />
+                                </Style>
+                            </controls:DataGridTextColumn.EditingElementStyle>
+                        </controls:DataGridTextColumn>
+                        <controls:DataGridTextColumn Header="CAP" Binding="{Binding CapLabel}" Width="60" IsReadOnly="True" />
+                        <controls:DataGridCheckBoxColumn Header="Activo" Binding="{Binding IsActive, Mode=TwoWay}" Width="70" />
+                        <controls:DataGridTextColumn Header="Orden" Binding="{Binding Order, Mode=TwoWay}" Width="70">
+                            <controls:DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextAlignment" Value="Right" />
+                                </Style>
+                            </controls:DataGridTextColumn.ElementStyle>
+                            <controls:DataGridTextColumn.EditingElementStyle>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="TextAlignment" Value="Right" />
+                                </Style>
+                            </controls:DataGridTextColumn.EditingElementStyle>
+                        </controls:DataGridTextColumn>
+                        <controls:DataGridTextColumn Header="Error" Binding="{Binding ErrorMessage}" Width="160" IsReadOnly="True" />
+                    </controls:DataGrid.Columns>
+                </controls:DataGrid>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Page>

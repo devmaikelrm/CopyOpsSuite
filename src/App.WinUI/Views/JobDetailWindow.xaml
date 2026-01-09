@@ -1,0 +1,104 @@
+<Window
+    x:Class="CopyOpsSuite.App.WinUI.Views.JobDetailWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:viewmodels="using:CopyOpsSuite.App.WinUI.ViewModels"
+    xmlns:core="using:CopyOpsSuite.Core.Models"
+    x:DataType="viewmodels:JobDetailViewModel"
+    Width="640" Height="520" Title="Detalle del job">
+
+    <Grid Padding="16" RowSpacing="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Stretch" ColumnSpacing="16">
+            <StackPanel>
+                <TextBlock Text="Job ID" FontWeight="SemiBold" />
+                <TextBlock Text="{x:Bind JobId}" />
+            </StackPanel>
+            <StackPanel>
+                <TextBlock Text="Estado" FontWeight="SemiBold" />
+                <TextBlock Text="{x:Bind Status}" />
+            </StackPanel>
+            <StackPanel>
+                <TextBlock Text="RAM" FontWeight="SemiBold" />
+                <TextBlock Text="{x:Bind RamSummary}" />
+            </StackPanel>
+            <StackPanel>
+                <TextBlock Text="Timeline" FontWeight="SemiBold" />
+                <TextBlock Text="{x:Bind TimelineSummary}" />
+            </StackPanel>
+        </StackPanel>
+
+        <Pivot Grid.Row="1" IsLocked="True">
+            <PivotItem Header="Lista">
+                <ListView ItemsSource="{x:Bind TransferItems}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="core:TransferItemLog">
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="{x:Bind Source}" FontWeight="SemiBold" />
+                                <TextBlock Text="{x:Bind Destination}" FontSize="12" Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+                                <TextBlock Text="{x:Bind SizeBytes, StringFormat='{}{0:N0} bytes'}" FontSize="10" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </PivotItem>
+            <PivotItem Header="Validaciones">
+                <ListView ItemsSource="{x:Bind Validations}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="core:ValidationLog">
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="{x:Bind Rule}" FontWeight="SemiBold" />
+                                <TextBlock Text="{x:Bind Details}" FontSize="12" />
+                                <TextBlock Text="{x:Bind Result}" FontSize="10" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </PivotItem>
+            <PivotItem Header="Errores">
+                <ListView ItemsSource="{x:Bind Errors}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="core:ErrorLog">
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="{x:Bind FilePath}" FontWeight="SemiBold" />
+                                <TextBlock Text="{x:Bind Message}" FontSize="12" />
+                                <TextBlock Text="{x:Bind ErrorCode}" FontSize="10" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </PivotItem>
+            <PivotItem Header="In RAM">
+                <ListView ItemsSource="{x:Bind RamStats}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="core:RamBufferStats">
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <TextBlock Text="{x:Bind Ts, StringFormat='[{0:HH:mm:ss}]'}" />
+                                <TextBlock Text="{x:Bind BytesBuffered, StringFormat='Buffered {0:N0} B'}" />
+                                <TextBlock Text="{x:Bind QueueDepth, StringFormat='Depth {0}'}" />
+                                <TextBlock Text="{x:Bind ThroughputMBps, StringFormat='Throughput {0:0.#} MB/s'}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </PivotItem>
+            <PivotItem Header="Timeline">
+                <ListView ItemsSource="{x:Bind TimelineEvents}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="core:AppEvent">
+                            <StackPanel Spacing="2">
+                                <TextBlock Text="{x:Bind Ts, StringFormat='[{0:HH:mm:ss}]'}" FontSize="12" />
+                                <TextBlock Text="{x:Bind Type}" FontWeight="SemiBold" />
+                                <TextBlock Text="{x:Bind Message}" TextWrapping="WrapWholeWords" FontSize="12" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </PivotItem>
+        </Pivot>
+    </Grid>
+</Window>

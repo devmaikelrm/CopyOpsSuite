@@ -1,0 +1,53 @@
+<Window
+    x:Class="CopyOpsSuite.App.WinUI.Views.MiniTransferWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:viewmodels="using:CopyOpsSuite.App.WinUI.ViewModels"
+    x:DataType="viewmodels:MiniTransferViewModel"
+    Width="320" Height="220" Title="MiniVentana de destino">
+    <Grid Padding="12" Background="#1F1F1F">
+        <Border CornerRadius="12" Padding="12" Background="#262626" BorderBrush="#333333" BorderThickness="1">
+            <StackPanel Spacing="8">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <TextBlock Text="{x:Bind DeviceId}" FontWeight="SemiBold" FontSize="16" />
+                        <TextBlock Text="{x:Bind FileSystem}" FontSize="12" Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+                        <TextBlock Text="{x:Bind BusHint}" FontSize="12" Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+                    </StackPanel>
+                    <Button Grid.Column="1" Content="Detalles" Command="{x:Bind OpenDetailsCommand}" />
+                </Grid>
+
+                <StackPanel>
+                    <ProgressBar Value="{x:Bind ProgressValue}" Maximum="1" Height="10" Foreground="#2AD4D8" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <TextBlock Text="{x:Bind WorkersText}" FontSize="11" />
+                    <TextBlock Text="{x:Bind QueueText}" FontSize="11" />
+                    <TextBlock Text="{x:Bind StateText}" FontSize="11" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="Velocidad:" FontSize="12" />
+                    <TextBlock Text="{x:Bind CurrentSpeed}" FontWeight="SemiBold" />
+                </StackPanel>
+                <TextBlock Text="{x:Bind AverageSpeed}" FontSize="11" Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}" />
+
+                <TextBlock Text="{x:Bind ChargeNowDisplay}" FontSize="14" FontWeight="SemiBold" />
+                <TextBlock Text="{x:Bind ChargeFinalDisplay}" FontSize="12"
+                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                           ToolTipService.ToolTip="{x:Bind ChargeTooltip}" />
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                    <Button Content="{x:Bind PauseResumeText}" Command="{x:Bind TogglePauseCommand}" />
+                    <Button Content="Detener" Command="{x:Bind StopCommand}" />
+                </StackPanel>
+                <TextBlock Text="{x:Bind StatusMessage}" FontSize="11" Foreground="{ThemeResource SystemControlForegroundBaseHighBrush}" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
