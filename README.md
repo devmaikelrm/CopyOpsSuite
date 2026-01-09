@@ -1,4 +1,7 @@
-﻿# CopyOpsSuite
+# CopyOpsSuite
+
+![CI](https://github.com/devmaikelrm/CopyOpsSuite/actions/workflows/ci.yml/badge.svg)
+![Release](https://github.com/devmaikelrm/CopyOpsSuite/actions/workflows/release.yml/badge.svg)
 
 Suite de copia y cobro en vivo para operaciones de duplicacion USB con precios por volumen (CUP+), auditoria y trazabilidad. Incluye modo bandeja, mini ventanas por destino y ajustes de tiers con CAP.
 
